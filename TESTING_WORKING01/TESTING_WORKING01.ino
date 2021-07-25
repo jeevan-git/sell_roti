@@ -7,10 +7,13 @@
 #define servo_ 7
 #define push_button 2
 
-int stepper_speed_ = 1;
-int servo_speed = 5;
-int pos = 0;
-int back_step = 30;
+int stepper_speed_ = 1000; //Speed of stepper
+int servo_speed = 5; //Default 5
+int pos = 0; 
+int back_step = 60;     //Default 60
+int revolution_ = 1660; //  Default 1600 one revolution
+int opening_time = 1000; //Default 1000
+int closing_time = 500; // Default 500
 
 Servo myservo;
 
@@ -34,8 +37,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   int data_ = digitalRead(push_button);
   if (data_ == 0) {
-    forward(1600);
-    //    delay(3000);
+    forward(revolution_);
   }
 
 }
@@ -48,7 +50,7 @@ void forward(int steps) {
     delay(servo_speed);                       // waits ms for the servo to reach the position
   }
 
-  delay(1000); // opening time between servo and stepper
+  delay(opening_time); // opening time between servo and stepper
 
   int i;
   digitalWrite(ENAPIN, LOW); //ENABLE IS ACTIVE LOW
@@ -58,11 +60,12 @@ void forward(int steps) {
     delayMicroseconds(STEPTIME);
     digitalWrite(STEPPIN, LOW);
     delayMicroseconds(STEPTIME);
-    delay(stepper_speed_);
+
+    delayMicroseconds(stepper_speed_);
   }
   digitalWrite(ENAPIN, HIGH); //DISABLE STEPPER
 
-  delay(500); // closing time between servo and stepper
+  delay(closing_time); // closing time between servo and stepper
 
   for (pos = 110; pos >= 0; pos -= 1) { // goes from 110 degrees to 0 degrees
     myservo.write(pos);              // tell servo to go to position in variable 'pos'
@@ -78,7 +81,8 @@ void forward(int steps) {
     delay(STEPTIME);
     digitalWrite(STEPPIN, LOW);
     delay(STEPTIME);
-    delay(stepper_speed_);
+
+    delayMicroseconds(stepper_speed_);
   }
   delay(1000);
 }

@@ -7,13 +7,14 @@
 #define servo_ 7
 #define push_button 2
 
-int stepper_speed_ = 1000; //Speed of stepper
-int servo_speed = 5; //Default 5
-int pos = 0; 
+int stepper_speed_ = 500; //Speed of stepper
+int servo_speed = 1; //Default 5
+int pos = 0;
 int back_step = 60;     //Default 60
 int revolution_ = 1660; //  Default 1600 one revolution
-int opening_time = 1000; //Default 1000
+int opening_time = 500; //Default 1000
 int closing_time = 500; // Default 500
+int before = 400;
 
 Servo myservo;
 
@@ -47,7 +48,7 @@ void forward(int steps) {
   for (pos = 0; pos <= 110; pos += 1) { // goes from 0 degrees to 110 degrees
     // in steps of 1 degree
     myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(servo_speed);                       // waits ms for the servo to reach the position
+    //    delay(servo_speed);                       // waits ms for the servo to reach the position
   }
 
   delay(opening_time); // opening time between servo and stepper
@@ -55,7 +56,7 @@ void forward(int steps) {
   int i;
   digitalWrite(ENAPIN, LOW); //ENABLE IS ACTIVE LOW
   digitalWrite(DIRPIN, HIGH); //SET DIRECTION
-  for (i = 0; i < steps; i++) {
+  for (i = 0; i < steps - before; i++) {
     digitalWrite(STEPPIN, HIGH);
     delayMicroseconds(STEPTIME);
     digitalWrite(STEPPIN, LOW);
@@ -63,15 +64,24 @@ void forward(int steps) {
 
     delayMicroseconds(stepper_speed_);
   }
-  digitalWrite(ENAPIN, HIGH); //DISABLE STEPPER
 
-  delay(closing_time); // closing time between servo and stepper
+  //  delay(closing_time); // closing time between servo and stepper
 
   for (pos = 110; pos >= 0; pos -= 1) { // goes from 110 degrees to 0 degrees
     myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(servo_speed);                       // waits ms for the servo to reach the position
+    //    delay(servo_speed);                       // waits ms for the servo to reach the position
   }
 
+  digitalWrite(ENAPIN, LOW); //ENABLE IS ACTIVE LOW
+  digitalWrite(DIRPIN, HIGH); //SET DIRECTION
+  for (i = 0; i < before; i++) {
+    digitalWrite(STEPPIN, HIGH);
+    delayMicroseconds(STEPTIME);
+    digitalWrite(STEPPIN, LOW);
+    delayMicroseconds(STEPTIME);
+
+    delayMicroseconds(stepper_speed_);
+  }
   delay(500);
 
   digitalWrite(ENAPIN, LOW); //ENABLE IS ACTIVE LOW
